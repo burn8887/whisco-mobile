@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TextInput, FlatL
 import { useRouter } from "expo-router";
 import { api, VodShelvesPayload, VodGridPayload, SlimTitle } from "../../src/api";
 import { Shelf, TitleCard } from "../../src/components/Cards";
+import WhiscoHeader from "../../src/components/WhiscoHeader";
 import { colors, font, radius, spacing } from "../../src/theme";
 
 export default function VodScreen() {
@@ -36,6 +37,7 @@ export default function VodScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      <WhiscoHeader subtitle="On Demand" />
       <View style={{ padding: spacing.md, paddingBottom: 0 }}>
         <TextInput
           placeholder={`Search ${shelves ? shelves.total.toLocaleString() : ""}+ titles…`}

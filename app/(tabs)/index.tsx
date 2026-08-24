@@ -2,6 +2,9 @@ import React, { useEffect, useState, useCallback } from "react";
 import { ScrollView, View, Text, StyleSheet, ActivityIndicator, RefreshControl, Pressable, useWindowDimensions } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { LinearGradient } from "expo-linear-gradient";
+import { useVideoPlayer, VideoView } from "expo-video";
+import WhiscoHeader from "../../src/components/WhiscoHeader";
 import { api, HomePayload, SlimTitle } from "../../src/api";
 import { Shelf, ChannelCard } from "../../src/components/Cards";
 import { colors, font, radius, spacing } from "../../src/theme";
@@ -9,6 +12,12 @@ import { colors, font, radius, spacing } from "../../src/theme";
 export default function HomeScreen() {
   const router = useRouter();
   const { width } = useWindowDimensions();
+  // The website's cinematic Whisco zoom strip, bundled in the app.
+  const bannerPlayer = useVideoPlayer(require("../../assets/brand/zoom-banner.mp4"), (p) => {
+    p.loop = true;
+    p.muted = true;
+    p.play();
+  });
   const [data, setData] = useState<HomePayload | null>(null);
   const [error, setError] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
@@ -50,6 +59,8 @@ export default function HomeScreen() {
   const hero = data.hero[0];
 
   return (
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+    <WhiscoHeader subtitle="Free live TV & movies" />
     <ScrollView
       style={{ backgroundColor: colors.bg }}
       contentContainerStyle={{ padding: spacing.md, paddingBottom: spacing.xl }}
@@ -79,9 +90,14 @@ export default function HomeScreen() {
             <Text numberOfLines={2} style={styles.heroName}>
               {hero.name}
             </Text>
-            <View style={styles.heroPlay}>
-              <Text style={styles.heroPlayText}>▶ Watch now</Text>
-            </View>
+            <LinearGradient
+              colors={["#f97316", "#db2777"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.heroPlay}
+            >
+              <Text style={styles.heroPlayTextGrad}>▶ Watch now</Text>
+            </LinearGradient>
           </View>
         </Pressable>
       )}
@@ -89,6 +105,16 @@ export default function HomeScreen() {
       <Text style={styles.stats}>
         {data.stats.channels}+ live channels · {data.stats.titles.toLocaleString()}+ free titles
       </Text>
+
+      {/* Whisco zoom strip — same cinematic moment as the website */}
+      <View style={styles.bannerWrap}>
+        <VideoView player={bannerPlayer} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} nativeControls={false} contentFit="cover" />
+        <LinearGradient colors={["rgba(10,10,15,0.85)", "transparent"]} start={{ x: 0, y: 0 }} end={{ x: 0, y: 0.4 }} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} />
+        <LinearGradient colors={["transparent", "rgba(10,10,15,0.9)"]} start={{ x: 0, y: 0.6 }} end={{ x: 0, y: 1 }} style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }} />
+        <Text style={styles.bannerTagline}>
+          Life's better at full speed — <Text style={{ color: colors.orange }}>and full free.</Text>
+        </Text>
+      </View>
 
       {data.rows.map((row) => (
         <Shelf key={row.key} label={row.label} items={row.items} onItem={openTitle} />
@@ -98,7 +124,15 @@ export default function HomeScreen() {
       {data.featuredChannels.map((c) => (
         <ChannelCard key={c.id} item={c as any} onPress={() => router.push(`/live/${c.id}`)} />
       ))}
+
+      <Pressable onPress={() => router.push("/login")} style={styles.signinRow}>
+        <Text style={styles.signinText}>Have a whisco.tv account? Sign in →</Text>
+      </Pressable>
+      <Pressable onPress={() => router.push("/about")} style={{ marginTop: spacing.xs }}>
+        <Text style={styles.aboutLink}>About Whisco TV · Contact us 🐾</Text>
+      </Pressable>
     </ScrollView>
+    </View>
   );
 }
 
@@ -127,13 +161,25 @@ const styles = StyleSheet.create({
   heroName: { color: colors.text, fontSize: font.title, fontWeight: "900", marginTop: 4 },
   heroPlay: {
     alignSelf: "flex-start",
-    backgroundColor: "#fff",
     borderRadius: radius.full,
     paddingHorizontal: spacing.md,
     paddingVertical: 8,
     marginTop: spacing.sm,
   },
   heroPlayText: { color: "#000", fontWeight: "800", fontSize: font.small },
+  heroPlayTextGrad: { color: "#fff", fontWeight: "800", fontSize: font.small },
+  bannerWrap: {
+    height: 190,
+    borderRadius: radius.xl,
+    overflow: "hidden",
+    marginBottom: spacing.lg,
+    backgroundColor: "#000",
+    justifyContent: "flex-end",
+  },
+  bannerTagline: { color: colors.text, fontSize: font.body, fontWeight: "800", textAlign: "center", marginBottom: spacing.sm },
+  signinRow: { marginTop: spacing.lg, alignItems: "center" },
+  signinText: { color: colors.orange, fontSize: font.small, fontWeight: "700" },
+  aboutLink: { color: colors.textFaint, fontSize: font.small, textAlign: "center", marginTop: spacing.sm },
   stats: { color: colors.textDim, fontSize: font.small, marginBottom: spacing.md },
   sectionLabel: { color: colors.text, fontSize: font.heading, fontWeight: "800", marginBottom: spacing.sm },
 });

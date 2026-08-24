@@ -4,6 +4,7 @@ import { Image } from "expo-image";
 import { useRouter, useFocusEffect } from "expo-router";
 import { getWatchlist, getResumeList, removeResume, type WatchlistItem, type ResumeEntry } from "../../src/store";
 import { TitleCard } from "../../src/components/Cards";
+import WhiscoHeader from "../../src/components/WhiscoHeader";
 import { colors, font, radius, spacing } from "../../src/theme";
 
 export default function MyListScreen() {
@@ -23,6 +24,8 @@ export default function MyListScreen() {
   const cardW = (width - spacing.md * 2) / numCols - 8;
 
   return (
+    <View style={{ flex: 1, backgroundColor: colors.bg }}>
+    <WhiscoHeader subtitle="My List" />
     <ScrollView style={{ backgroundColor: colors.bg }} contentContainerStyle={{ padding: spacing.md, paddingBottom: spacing.xl }}>
       {resume.length > 0 && (
         <>
@@ -70,6 +73,7 @@ export default function MyListScreen() {
         </View>
       )}
     </ScrollView>
+    </View>
   );
 }
 

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ActivityIndicator, FlatList, TextInput, Pressab
 import { useRouter } from "expo-router";
 import { api, LivePayload } from "../../src/api";
 import { ChannelCard } from "../../src/components/Cards";
+import WhiscoHeader from "../../src/components/WhiscoHeader";
 import { colors, font, radius, spacing } from "../../src/theme";
 
 export default function LiveScreen() {
@@ -28,6 +29,7 @@ export default function LiveScreen() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
+      <WhiscoHeader subtitle="Live TV" />
       <View style={{ padding: spacing.md, paddingBottom: 0 }}>
         <TextInput
           placeholder="Search channels…"

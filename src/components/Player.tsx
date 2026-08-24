@@ -109,21 +109,34 @@ function NativePlayer({
 
 function YouTubePlayer({ src, title }: { src: string; title?: string }) {
   const [loading, setLoading] = useState(true);
-  const uri = useMemo(() => `${src}${src.includes("?") ? "&" : "?"}autoplay=1&playsinline=1`, [src]);
+  // Fix for YouTube error 153 ("configuration error"): embeds require a valid
+  // origin/referer. Loading the embed URL directly in a WebView sends none.
+  // Instead we render a tiny host page with baseUrl https://www.whisco.tv so
+  // the iframe sees the same origin as the website — where embeds work.
+  const embedUrl = useMemo(
+    () => `${src}${src.includes("?") ? "&" : "?"}autoplay=1&playsinline=1&rel=0`,
+    [src]
+  );
+  const html = useMemo(
+    () => `<!DOCTYPE html><html><head><meta name="viewport" content="width=device-width, initial-scale=1"><style>html,body{margin:0;padding:0;background:#000;height:100%;overflow:hidden}iframe{position:absolute;inset:0;width:100%;height:100%;border:0}</style></head><body><iframe src="${embedUrl}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen referrerpolicy="origin"></iframe></body></html>`,
+    [embedUrl]
+  );
 
   return (
     <View style={styles.frame}>
       <WebView
-        source={{ uri }}
+        source={{ html, baseUrl: "https://www.whisco.tv" }}
         style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0 }}
+        originWhitelist={["*"]}
         allowsFullscreenVideo
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction={false}
         javaScriptEnabled
         domStorageEnabled
+        thirdPartyCookiesEnabled
         onLoadEnd={() => setLoading(false)}
         onShouldStartLoadWithRequest={(req) =>
-          req.url.startsWith("https://www.youtube.com/embed") || req.url === uri || req.url === "about:blank"
+          req.url.includes("youtube.com") || req.url.includes("whisco.tv") || req.url === "about:blank"
         }
         accessibilityLabel={title || "Video player"}
       />
