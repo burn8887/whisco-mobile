@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { View, StyleSheet, ActivityIndicator, Text } from "react-native";
 import { useVideoPlayer, VideoView } from "expo-video";
 import { WebView } from "react-native-webview";
@@ -6,19 +6,82 @@ import { colors, font, spacing } from "../theme";
 
 // Universal Whisco player.
 //  - HLS (.m3u8) / MP4 → expo-video (native ExoPlayer on Android): instant
-//    start, adaptive quality, fullscreen, PiP.
+//    start, adaptive quality, fullscreen, PiP, resume support.
 //  - YouTube embeds → official iframe player in a WebView (ToS-compliant;
 //    the broadcaster keeps its ads/analytics).
-export default function Player({ src, title }: { src: string; title?: string }) {
+export default function Player({
+  src,
+  title,
+  startAt,
+  onProgress,
+}: {
+  src: string;
+  title?: string;
+  startAt?: number; // seconds — native player only
+  onProgress?: (positionSecs: number) => void; // fires ~every 5s, native only
+}) {
   const isYouTube = src.includes("youtube.com/embed");
-  return isYouTube ? <YouTubePlayer src={src} title={title} /> : <NativePlayer src={src} />;
+  return isYouTube ? (
+    <YouTubePlayer src={src} title={title} />
+  ) : (
+    <NativePlayer src={src} startAt={startAt} onProgress={onProgress} />
+  );
 }
 
-function NativePlayer({ src }: { src: string }) {
+function NativePlayer({
+  src,
+  startAt,
+  onProgress,
+}: {
+  src: string;
+  startAt?: number;
+  onProgress?: (positionSecs: number) => void;
+}) {
   const [error, setError] = useState(false);
+  const seeked = useRef(false);
+
   const player = useVideoPlayer(src, (p) => {
     p.play();
   });
+
+  // Resume: seek once after load.
+  useEffect(() => {
+    if (!startAt || seeked.current) return;
+    const t = setInterval(() => {
+      try {
+        if (player.duration > 0 && !seeked.current) {
+          if (startAt < player.duration - 30) player.currentTime = startAt;
+          seeked.current = true;
+          clearInterval(t);
+        }
+      } catch {
+        /* player not ready yet */
+      }
+    }, 500);
+    return () => clearInterval(t);
+  }, [player, startAt]);
+
+  // Progress reporting for resume-watching.
+  useEffect(() => {
+    if (!onProgress) return;
+    const t = setInterval(() => {
+      try {
+        const pos = player.currentTime;
+        if (pos > 0 && Number.isFinite(pos)) onProgress(Math.floor(pos));
+      } catch {
+        /* ignore */
+      }
+    }, 5000);
+    return () => clearInterval(t);
+  }, [player, onProgress]);
+
+  // Error surface: listen to status changes.
+  useEffect(() => {
+    const sub = player.addListener("statusChange", ({ status }) => {
+      if (status === "error") setError(true);
+    });
+    return () => sub.remove();
+  }, [player]);
 
   if (error) {
     return (
@@ -59,7 +122,6 @@ function YouTubePlayer({ src, title }: { src: string; title?: string }) {
         javaScriptEnabled
         domStorageEnabled
         onLoadEnd={() => setLoading(false)}
-        // Keep navigation inside the player; block YouTube link-outs.
         onShouldStartLoadWithRequest={(req) =>
           req.url.startsWith("https://www.youtube.com/embed") || req.url === uri || req.url === "about:blank"
         }

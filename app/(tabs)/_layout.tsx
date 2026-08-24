@@ -23,6 +23,7 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{ title: "Whisco TV", tabBarLabel: "Home", tabBarIcon: icon("🏠") }} />
       <Tabs.Screen name="live" options={{ title: "Live TV", tabBarIcon: icon("📺") }} />
       <Tabs.Screen name="vod" options={{ title: "On Demand", tabBarIcon: icon("🎬") }} />
+      <Tabs.Screen name="mylist" options={{ title: "My List", tabBarIcon: icon("🔖") }} />
     </Tabs>
   );
 }
