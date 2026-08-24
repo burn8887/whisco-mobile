@@ -39,11 +39,15 @@
       ]
     ],
     "extra": {
-      "router": {}
+      "router": {},
+      "eas": {
+        "projectId": "0c4f0508-0c37-438c-a553-5016aa3aaba6"
+      }
     },
     "web": {
       "bundler": "metro",
       "output": "single"
-    }
+    },
+    "owner": "burn8887s-team"
   }
 }
