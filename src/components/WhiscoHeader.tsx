@@ -3,14 +3,16 @@ import { View, Text, StyleSheet, Pressable } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors, font, spacing } from "../theme";
 
 // Branded app header: Whisco mascot + wordmark with the sunset gradient,
 // exactly like the website. Used across all tab screens.
 export default function WhiscoHeader({ subtitle }: { subtitle?: string }) {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   return (
-    <View style={styles.wrap}>
+    <View style={[styles.wrap, { paddingTop: insets.top + spacing.sm }]}>
       <Pressable style={styles.brand} onPress={() => router.push("/about")}>
         <Image source={require("../../assets/brand/sticker.png")} style={styles.mascot} contentFit="contain" />
         <View>

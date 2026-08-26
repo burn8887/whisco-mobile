@@ -1,39 +1,42 @@
 import React from "react";
 import { Tabs } from "expo-router";
-import { Text, View, StyleSheet } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { colors } from "../../src/theme";
+import { PawIcon, BoneClapperIcon, PlayScreenIcon, CollarTagIcon } from "../../src/components/TabIcons";
 
-// Whisco-themed tab bar: dog/home-life glyphs instead of generic icons, with
-// a sunset-gradient pill behind the active tab — carries the website's
-// orange→pink identity into the app chrome.
-const GLYPHS: Record<string, { active: string; idle: string }> = {
-  index: { active: "🐶", idle: "🐾" },   // Home = Whisco himself
-  live: { active: "📡", idle: "📺" },    // Live TV
-  vod: { active: "🍿", idle: "🎬" },     // On Demand = movie night
-  mylist: { active: "🦴", idle: "🦴" },  // My List = Whisco's buried bones
+// Whisco tab bar — custom-designed brand icons (user spec):
+//   Home → paw print · Live TV → bone clapperboard · On Demand → play screen
+//   My List → collar tag with engraved star.
+// Active icon renders in the sunset gradient with a soft gradient pill.
+
+const ICONS: Record<string, React.ComponentType<{ focused: boolean; size?: number }>> = {
+  index: PawIcon,
+  live: BoneClapperIcon,
+  vod: PlayScreenIcon,
+  mylist: CollarTagIcon,
 };
 
 function TabIcon({ route, focused }: { route: string; focused: boolean }) {
-  const g = GLYPHS[route] ?? GLYPHS.index;
+  const Icon = ICONS[route] ?? PawIcon;
   return (
     <View style={styles.iconWrap}>
       {focused && (
         <LinearGradient
-          colors={["rgba(249,115,22,0.28)", "rgba(219,39,119,0.28)"]}
+          colors={["rgba(249,115,22,0.16)", "rgba(219,39,119,0.16)"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
           style={styles.activePill}
         />
       )}
-      <Text style={{ fontSize: focused ? 22 : 19, opacity: focused ? 1 : 0.75 }}>
-        {focused ? g.active : g.idle}
-      </Text>
+      <Icon focused={focused} size={24} />
     </View>
   );
 }
 
 export default function TabsLayout() {
+  const insets = useSafeAreaInsets();
   return (
     <Tabs
       screenOptions={({ route }) => ({
@@ -42,12 +45,13 @@ export default function TabsLayout() {
           backgroundColor: "#0d0d13",
           borderTopColor: "rgba(249,115,22,0.15)",
           borderTopWidth: 1,
-          height: 62,
+          height: 60 + insets.bottom,
           paddingTop: 6,
+          paddingBottom: Math.max(insets.bottom, 6),
         },
         tabBarActiveTintColor: colors.orange,
         tabBarInactiveTintColor: colors.textFaint,
-        tabBarLabelStyle: { fontSize: 10, fontWeight: "700", paddingBottom: 6 },
+        tabBarLabelStyle: { fontSize: 10, fontWeight: "700" },
         tabBarIcon: ({ focused }) => <TabIcon route={route.name} focused={focused} />,
         sceneStyle: { backgroundColor: colors.bg },
       })}

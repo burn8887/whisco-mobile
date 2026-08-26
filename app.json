@@ -48,6 +48,11 @@
       "bundler": "metro",
       "output": "single"
     },
-    "owner": "burn8887s-team"
+    "owner": "burn8887s-team",
+    "androidStatusBar": {
+      "barStyle": "light-content",
+      "backgroundColor": "#00000000",
+      "translucent": true
+    }
   }
 }
