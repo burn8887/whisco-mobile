@@ -27,7 +27,19 @@
     },
     "ios": {
       "bundleIdentifier": "tv.whisco.app",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "buildNumber": "1",
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ],
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false
+        }
+      },
+      "associatedDomains": [],
+      "icon": "./assets/ios-icon.png"
     },
     "plugins": [
       "expo-router",
