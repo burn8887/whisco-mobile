@@ -2,3 +2,7 @@ node_modules/
 dist/
 .expo/
 *.log
+
+# local signing credentials — never commit
+credentials.json
+credentials/
