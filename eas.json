@@ -36,7 +36,8 @@
         "ascApiKeyPath": "/home/user/.keys/AuthKey_B279KL3Y3K.p8",
         "ascApiKeyId": "B279KL3Y3K",
         "ascApiKeyIssuerId": "b071aa69-7af0-411d-9019-9b9057882600",
-        "appleTeamId": "X2UPN4792Y"
+        "appleTeamId": "X2UPN4792Y",
+        "ascAppId": "6807647992"
       }
     }
   }
