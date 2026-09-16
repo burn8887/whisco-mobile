@@ -24,6 +24,10 @@ export type Channel = {
   category: string;
   isHD: boolean;
   isActive?: boolean;
+  /** Why we believe we may carry this channel — shown in the app as the Source note. */
+  rightsBasis?: string | null;
+  /** The official URL a viewer can check: the broadcaster's own channel. */
+  evidenceUrl?: string | null;
 };
 
 export type Episode = {
@@ -46,6 +50,12 @@ export type TitleDetail = SlimTitle & {
   language: string;
   streamUrl: string | null;
   seasons: { number: number; episodes: Episode[] }[];
+  /** Why we believe we may carry this title — shown in the app as the Source note. */
+  rightsBasis?: string | null;
+  /** The official URL a viewer can check: the archive item page. */
+  evidenceUrl?: string | null;
+  /** Set when the item came from an official uploader channel. */
+  uploaderUrl?: string | null;
 };
 
 export type HomePayload = {
@@ -78,8 +88,23 @@ export type VodGridPayload = {
   items: SlimTitle[];
 };
 
+// The App Store build reads a NARROWED catalogue, not the public one.
+//
+// Apple rejected build 5 under 5.2.2: the app showed a catalogue containing content
+// we cannot document the right to use. The fix is a store gate on the server: this
+// header makes /api/mobile/v1 return ONLY rows a human has cleared for the App Store
+// build, each with an evidence link. Without the header the API still serves the full
+// public catalogue — which is what the website and the Android build receive, and they
+// are unaffected.
+//
+// If a row is not cleared it is simply absent, and a deep link to it returns 404.
+// This build ships a small, provable catalogue on purpose. That is the point.
+const STORE_HEADER = { "X-Whisco-Store": "ios" } as const;
+
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`${BASE}${path}`, { headers: { Accept: "application/json" } });
+  const res = await fetch(`${BASE}${path}`, {
+    headers: { Accept: "application/json", ...STORE_HEADER },
+  });
   if (!res.ok) throw new Error(`API ${res.status}: ${path}`);
   return res.json() as Promise<T>;
 }
