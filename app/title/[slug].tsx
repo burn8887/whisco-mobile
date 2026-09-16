@@ -4,6 +4,7 @@ import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { api, TitleDetail, SlimTitle, Episode } from "../../src/api";
 import Player from "../../src/components/Player";
+import RightsNote from "../../src/components/RightsNote";
 import { TitleCard } from "../../src/components/Cards";
 import { isInWatchlist, toggleWatchlist, saveResume, getResumeFor, type ResumeEntry } from "../../src/store";
 import { colors, font, radius, spacing } from "../../src/theme";
@@ -138,6 +139,9 @@ export default function TitleScreen() {
           </View>
 
           <Text style={styles.synopsis}>{title.synopsis}</Text>
+
+          {/* Where this title comes from, and how to challenge it. */}
+          <RightsNote rightsBasis={title.rightsBasis} evidenceUrl={title.evidenceUrl ?? title.uploaderUrl} />
 
           {isSeries && (
             <>

@@ -3,6 +3,7 @@ import { ScrollView, View, Text, StyleSheet, ActivityIndicator } from "react-nat
 import { useLocalSearchParams, useRouter, Stack } from "expo-router";
 import { api, Channel } from "../../src/api";
 import Player from "../../src/components/Player";
+import RightsNote from "../../src/components/RightsNote";
 import { ChannelCard } from "../../src/components/Cards";
 import { colors, font, spacing } from "../../src/theme";
 
@@ -41,6 +42,9 @@ export default function ChannelScreen() {
           {channel.country} · {channel.category} · {channel.language}
           {channel.isHD ? " · HD" : ""}
         </Text>
+
+          {/* Where this channel comes from, and how to challenge it. */}
+          <RightsNote rightsBasis={channel.rightsBasis} evidenceUrl={channel.evidenceUrl} />
 
         <Text style={styles.sectionLabel}>More {channel.category} channels</Text>
         {related.map((c) => (
