@@ -33,9 +33,6 @@
       "supportsTablet": true,
       "buildNumber": "1",
       "infoPlist": {
-        "UIBackgroundModes": [
-          "audio"
-        ],
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": false
@@ -45,6 +42,7 @@
       "icon": "./assets/ios-icon.png"
     },
     "plugins": [
+      "./plugins/withNoBackgroundAudio",
       "expo-router",
       [
         "expo-video",
