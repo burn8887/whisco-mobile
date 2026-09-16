@@ -1,4 +1,6 @@
 // Whisco TV mobile API client — talks to the versioned mobile API.
+
+import { Platform } from "react-native";
 const BASE = "https://www.whisco.tv/api/mobile/v1";
 
 export type SlimTitle = {
@@ -99,7 +101,14 @@ export type VodGridPayload = {
 //
 // If a row is not cleared it is simply absent, and a deep link to it returns 404.
 // This build ships a small, provable catalogue on purpose. That is the point.
-const STORE_HEADER = { "X-Whisco-Store": "ios" } as const;
+//
+// iOS ONLY. This file is compiled into BOTH the iOS and the Android build
+// (app.json: tv.whisco.app for both). Sending the header unconditionally would hand the
+// Android app the narrowed App Store catalogue too — and Android is already live in
+// closed testing on the full one. So Android keeps the fat catalogue and only the App
+// Store build asks for the cleared set.
+const STORE_HEADER =
+  Platform.OS === "ios" ? ({ "X-Whisco-Store": "ios" } as const) : ({} as const);
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
