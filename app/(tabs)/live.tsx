@@ -42,7 +42,7 @@ export default function LiveScreen() {
         />
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginTop: spacing.sm }}>
           <Pill label="All" active={!language} onPress={() => setLanguage("")} />
-          {(data?.facets.languages || []).map((l) => (
+          {(data?.facets?.languages || []).map((l) => (
             <Pill
               key={l.language}
               label={`${l.language} ${l.count}`}
