@@ -102,13 +102,33 @@ export type VodGridPayload = {
 // If a row is not cleared it is simply absent, and a deep link to it returns 404.
 // This build ships a small, provable catalogue on purpose. That is the point.
 //
-// iOS ONLY. This file is compiled into BOTH the iOS and the Android build
-// (app.json: tv.whisco.app for both). Sending the header unconditionally would hand the
-// Android app the narrowed App Store catalogue too — and Android is already live in
-// closed testing on the full one. So Android keeps the fat catalogue and only the App
-// Store build asks for the cleared set.
-const STORE_HEADER =
-  Platform.OS === "ios" ? ({ "X-Whisco-Store": "ios" } as const) : ({} as const);
+  // BOTH STORES, SAME CLEARED CATALOGUE (Grok, 2026-09-17).
+  //
+  // This one file is compiled into the iOS AND the Android build (app.json:
+  // tv.whisco.app for both), so the header is sent per platform rather than
+  // unconditionally:
+  //   iOS            -> X-Whisco-Store: ios
+  //   Android / Play -> X-Whisco-Store: android
+  //
+  // Grok's Android brief: Play must ship the same 8 live + 8 VOD catalogue as iOS
+  // build 7, under the same doctrine - no harvested HLS, no cinema/dizi, no counts
+  // the app cannot honour. The API accepts "android" and "play" as the same cleared
+  // catalogue (store-gate.ts, Option A), so both stores read one code path and
+  // cannot drift apart.
+  //
+  // Why a per-platform value rather than one constant: a Play client claiming to be
+  // an iOS client is dishonest naming, and the API echoes the value back as `store`,
+  // so the response would lie about who asked.
+  //
+  // A client sending NO header still gets the fat catalogue. Deliberate: the Play
+  // closed-test binary installed on testers predates this change and must keep
+  // working until those testers update.
+  const STORE_HEADER: Record<string, string> =
+    Platform.OS === "ios"
+      ? { "X-Whisco-Store": "ios" }
+      : Platform.OS === "android"
+        ? { "X-Whisco-Store": "android" }
+        : {};
 
 async function get<T>(path: string): Promise<T> {
   const res = await fetch(`${BASE}${path}`, {
