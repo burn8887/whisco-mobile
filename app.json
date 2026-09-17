@@ -30,7 +30,7 @@
     },
     "ios": {
       "bundleIdentifier": "tv.whisco.app",
-      "supportsTablet": true,
+      "supportsTablet": false,
       "buildNumber": "1",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
