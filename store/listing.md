@@ -1,5 +1,18 @@
 # Play Store Listing — Whisco TV (copy-paste ready)
 
+> ## ⚠️ SUPERSEDED — do not paste from this file
+>
+> The authoritative listing copy is **`store/play-listing.md`** (corrected 21 Sep 2026).
+>
+> This file is the **old draft**. Corrected in it on 21 Sep 2026, by Grok ruling 9.7: the account
+> line and the **Data safety** rows (they contradicted the Play declaration, which reads
+> **Email + User ID**) and the contact address (`privacy@` no longer exists).
+>
+> **Not corrected, pending a separate ruling:** the short description still carries the banned
+> `500+` / `14,000+` counts, and the description body names `dizi`, `Bollywood`, `free-to-air` and
+> an `iptv` tag. None of that matches the Play app, which carries 8 live channels and 8 films.
+> **Do not paste anything from this file into a store console.**
+
 ## App name (30 chars max)
 Whisco TV: Free Live TV & VOD
 
@@ -24,7 +37,7 @@ News, entertainment, sports, movies and music channels from India, Pakistan, Ban
 
 ✨ WHY WHISCO TV
 • Completely free — supported by ads, never a subscription
-• No account needed to watch; sign-up only adds watchlist & resume
+• Watch without signing up — an account is optional; sign-up only adds watchlist & resume
 • Continue watching across sessions
 • Clean, fast, modern — built for phones, tablets, Chromebooks and TVs
 • Channels and shows checked automatically around the clock, so dead links never waste your time
@@ -50,10 +63,12 @@ https://whisco.tv/privacy
 - Target age: 13+ (Teen) — news content can include real-world violence
 
 ## Data safety form answers
-- Data collected: none mandatory. Optional email/name only if user creates account (not in v1 app — local watchlist only → declare NO data collected)
-- Data shared with third parties: NO (ads come later via AdSense web; v1 app has NO ads)
+- Data collected: **Email + User ID** — accounts are optional; if a user creates one we collect their
+  email address and a user ID, as declared in the Play Data safety section. No analytics SDK.
+- Data shared with third parties: NO
 - Data encrypted in transit: YES
-- Data deletion: users can clear app storage / contact privacy@whisco.tv
+- Ads: the Play listing describes the app as ad-supported.
+- Data deletion: users can clear app storage, or email **legal@whisco.tv** — deletion on request.
 
 ## Screenshots needed (min 2, take on device/emulator once installed)
 1. Home tab (hero + shelves)
