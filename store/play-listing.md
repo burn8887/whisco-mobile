@@ -114,6 +114,12 @@ apply here.
 | Content rating questionnaire | answer honestly; advertising = yes; no user-generated content |
 | **Data safety** | **Email + User ID** — accounts are optional; if you create one we collect your email address and a user ID, as declared. No analytics SDK. |
 
+## Other stores
+
+**Amazon Appstore (Fire TV) — not submitted.** The same AAB/assets would apply; submission is via
+`developer.amazon.com`. If it is ever submitted: **do not paste counts from anywhere** — same 8 live
+channels and 8 films, no `500+`, no `14,000+`, no `dizi`, no `iptv`.
+
 ## Before you tap anything
 
 - The AAB must be built from `whisco-mobile` `main` at **`db15dfa` or later** — that commit is what sends
