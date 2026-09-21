@@ -1,5 +1,11 @@
 # Google Play listing — Whisco TV (Android build, same catalogue as iOS build 7)
 
+> **Status — 21 September 2026.** Production access is **granted**; version code **7** is on the
+> production track and the full-rollout change set is **in review** in Play Console. Corrected on this
+> date, **doc-only**: the short description, the "account" line, and the **Data safety** row — all three
+> contradicted the Play Data safety declaration, which reads **Email + User ID**. The
+> "Apply for production" instruction near the end of this file is **superseded**. No new AAB.
+
 **Paste these into Play Console → Main store listing. Nothing here may claim a number or a category the app does
 not actually have.** The catalogue is 8 live channels and 8 films. That is the whole story, and it is enough.
 
@@ -20,10 +26,10 @@ Whisco TV
 ## Short description (80 characters max)
 
 ```
-Official live news and public-domain films. No signup.
+Official live news and public-domain films. Watch with no signup.
 ```
 
-That is **57 characters** — inside the limit.
+That is **65 characters** — inside the limit.
 
 ## Full description (4,000 characters max)
 
@@ -56,7 +62,7 @@ HOW IT WORKS
 • We host no video files. Live channels play through YouTube's embeddable player; films stream from archive.org.
 • No download, save or convert function — the app cannot export anything.
 • Supported by advertising.
-• No account needed to watch. Optional sign-in adds a watchlist and resume.
+• Watch without signing up — an account is optional. Optional sign-in adds a watchlist and resume.
 
 Rights holders: legal@whisco.tv — anything flagged is removed within 24 hours.
 ```
@@ -106,12 +112,12 @@ apply here.
 | Website | `https://whisco.tv/about` |
 | Support | `https://whisco.tv/contact` |
 | Content rating questionnaire | answer honestly; advertising = yes; no user-generated content |
-| **Data safety** | **Data Not Collected** — the app has no analytics SDK and no account requirement |
+| **Data safety** | **Email + User ID** — accounts are optional; if you create one we collect your email address and a user ID, as declared. No analytics SDK. |
 
 ## Before you tap anything
 
 - The AAB must be built from `whisco-mobile` `main` at **`db15dfa` or later** — that commit is what sends
   `X-Whisco-Store: android` and therefore gets the 8 + 8 catalogue.
-- Do not press **Apply for production** — Grok's instruction is that the closed track gets the new build first,
-  and he wants the production-access form answered honestly (see
-  `docs/business/PLAY_PRODUCTION_ACCESS_FORM_20260917.md`).
+- ~~Do not press **Apply for production**~~ — **superseded 21 September 2026: production access was
+  granted** and version code 7 is on the production track in review. Nothing to apply for; see
+  `docs/business/PLAY_PRODUCTION_ACCESS_FORM_20260917.md` for the form that was answered.
