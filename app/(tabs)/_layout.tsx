@@ -7,9 +7,15 @@ import { colors } from "../../src/theme";
 import { PawIcon, BoneClapperIcon, PlayScreenIcon, CollarTagIcon } from "../../src/components/TabIcons";
 
 // Whisco tab bar — custom-designed brand icons (user spec):
-//   Home → paw print · Live TV → bone clapperboard · On Demand → play screen
-//   My List → collar tag with engraved star.
+//   Home → paw print · Live TV → bone clapperboard.
 // Active icon renders in the sunset gradient with a soft gradient pill.
+//
+// BUILD 8 (Apple 5.2.2, 2026-09-28): the On Demand and My List TABS ARE GONE
+// from the bar. This binary carries eight official news live streams and no
+// on-demand titles, so a tab that opens onto films — or onto a saved list of
+// films — is a 5.2.2 finding waiting to happen. Both screens are pinned with
+// `href: null` rather than deleted, because an old deep link or a stale
+// router.push must land on the empty state, not on a crash.
 
 const ICONS: Record<string, React.ComponentType<{ focused: boolean; size?: number }>> = {
   index: PawIcon,
@@ -58,8 +64,9 @@ export default function TabsLayout() {
     >
       <Tabs.Screen name="index" options={{ tabBarLabel: "Home" }} />
       <Tabs.Screen name="live" options={{ tabBarLabel: "Live TV" }} />
-      <Tabs.Screen name="vod" options={{ tabBarLabel: "On Demand" }} />
-      <Tabs.Screen name="mylist" options={{ tabBarLabel: "My List" }} />
+      {/* Present as routes, absent from the bar. See the note above. */}
+      <Tabs.Screen name="vod" options={{ href: null }} />
+      <Tabs.Screen name="mylist" options={{ href: null }} />
     </Tabs>
   );
 }

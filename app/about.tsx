@@ -39,9 +39,8 @@ export default function AboutScreen() {
             Hi, I'm <Text style={{ color: colors.orange }}>Whisco</Text> 🐾
           </Text>
           <Text style={styles.heroBody}>
-            Yes, Whisco TV is genuinely named after a real Shih Tzu. This whole platform is his — hundreds of live
-            channels and thousands of movies, free for every household, no credit card ever. He personally supervises
-            every new channel we add (mostly by napping nearby).
+            Yes, Whisco TV is genuinely named after a real Shih Tzu. He personally supervises every new channel we
+            add (mostly by napping nearby).
           </Text>
         </View>
 

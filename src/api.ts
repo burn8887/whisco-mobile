@@ -92,15 +92,18 @@ export type VodGridPayload = {
 
 // The App Store build reads a NARROWED catalogue, not the public one.
 //
-// Apple rejected build 5 under 5.2.2: the app showed a catalogue containing content
-// we cannot document the right to use. The fix is a store gate on the server: this
-// header makes /api/mobile/v1 return ONLY rows a human has cleared for the App Store
-// build, each with an evidence link. Without the header the API still serves the full
-// public catalogue — which is what the website and the Android build receive, and they
-// are unaffected.
+// Apple rejected build 5, then build 7, under 5.2.2. The build-8 ruling
+// (2026-09-28) makes the split sharper than "cleared":
 //
-// If a row is not cleared it is simply absent, and a deep link to it returns 404.
-// This build ships a small, provable catalogue on purpose. That is the point.
+//   iOS            -> EIGHT official news live streams. Zero on-demand titles.
+//                     /vod is empty, every /title/<slug> is a 404.
+//   Android / Play -> the cleared 8 live + 8 films it is in review with.
+//   no header      -> the full public catalogue (the website).
+//
+// The server decides all of that; this file only says who is asking. The live
+// eight are an allow-list of YouTube channel ids on the server side
+// (src/lib/store-ios-live.ts in Whisco-TV-), so no database flag can widen the
+// Apple catalogue by accident, and a deep link to anything else returns 404.
 //
   // BOTH STORES, SAME CLEARED CATALOGUE (Grok, 2026-09-17).
   //
