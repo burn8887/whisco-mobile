@@ -27,13 +27,36 @@
  * reads the PNG's IHDR header and throws if the dimensions are wrong. It parses
  * the header directly — no image dependency, no new package.
  *
+ * 4. android.intent.category.LEANBACK_LAUNCHER — Desk ruling, 4 Oct 2026:
+ *      "Add LEANBACK_LAUNCHER to the TV activity." Without this category the app
+ *      is invisible to Google Play on TV devices and does not appear in the TV
+ *      home screen at all (Google's own caution, see the citation below).
+ *
+ *      HOW IT IS ADDED, AND WHY THAT WAY
+ *      React Native ships ONE activity (MainActivity) which serves phone and TV;
+ *      the TV/phone split happens in JS via Platform.isTV. Google's documented
+ *      pattern for a single activity serving both form factors puts both
+ *      categories in the SAME intent-filter:
+ *
+ *        <intent-filter>
+ *          <action android:name="android.intent.action.MAIN" />
+ *          <category android:name="android.intent.category.LAUNCHER" />
+ *          <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+ *        </intent-filter>
+ *
+ *      (developer.android.com/training/tv/get-started/create — fetched 4 Oct 2026,
+ *      page updated 2026-09-28. The separate-activity form shown earlier on that
+ *      page is for apps with a distinct TV activity; we do not have one, and
+ *      inventing one would mean native code we cannot build or test here.)
+ *
+ *      The LAUNCHER category is left in place, so the phone icon and the phone
+ *      launch path are unchanged; LEANBACK_LAUNCHER is purely additive.
+ *
  * WHAT IT DELIBERATELY DOES NOT TOUCH
- * - No new activity, no launcher-intent change: the existing MAIN/LAUNCHER
- *   activity keeps the phone behaviour byte-for-byte.
- * - No leanback <intent-filter> is added yet. A LEANBACK_LAUNCHER filter on the
- *   same activity changes how it is resolved on TV devices, and that is a
- *   runtime behaviour we cannot verify in this sandbox. It is the documented
- *   remaining step before a TV release — see store/tv-build.md.
+ * - No new activity: the single MainActivity keeps serving both form factors,
+ *   with the JS layer choosing the layout (Platform.isTV).
+ * - The existing MAIN/LAUNCHER filter is not removed or reordered — one category
+ *   is appended to it.
  * - No iOS surface, no permissions, no versionCode (EAS owns that remotely).
  *
  * PLUGIN ORDER
@@ -124,6 +147,55 @@ function withAndroidTV(config) {
     const mainApplication = AndroidConfig.Manifest.getMainApplicationOrThrow(manifest);
     mainApplication.$ = mainApplication.$ || {};
     mainApplication.$["android:banner"] = "@drawable/tv_banner";
+
+    // ---- 4. LEANBACK_LAUNCHER on the main activity --------------------------
+    // Desk ruling 4 Oct 2026. Appended to the existing MAIN/LAUNCHER filter, per
+    // Google's single-activity pattern (see the header comment for the citation).
+    // The activity is located via expo's own helper so we can never accidentally
+    // decorate the wrong activity if the template ever changes.
+    const mainActivity = AndroidConfig.Manifest.getMainActivityOrThrow(manifest);
+
+    // Normalise to an array: expo's manifest model uses a single object when
+    // there is exactly one <intent-filter> and an array when there are several.
+    const filters = Array.isArray(mainActivity["intent-filter"])
+      ? mainActivity["intent-filter"]
+      : mainActivity["intent-filter"]
+        ? [mainActivity["intent-filter"]]
+        : [];
+    if (filters.length === 0) {
+      throw new Error(
+        "[withAndroidTV] MainActivity has no intent-filter; refusing to guess " +
+          "where LEANBACK_LAUNCHER belongs."
+      );
+    }
+
+    const LEANBACK = "android.intent.category.LEANBACK_LAUNCHER";
+    const hasCategory = (filter) =>
+      (filter.category || []).some((c) => c?.$?.["android:name"] === LEANBACK);
+
+    // Prefer the filter that already carries MAIN + LAUNCHER (the launcher entry
+    // the phone uses). Fall back to the first MAIN filter if the template moved.
+    const launcherFilter =
+      filters.find(
+        (f) =>
+          (f.action || []).some(
+            (a) => a?.$?.["android:name"] === "android.intent.action.MAIN"
+          ) &&
+          (f.category || []).some(
+            (c) => c?.$?.["android:name"] === "android.intent.category.LAUNCHER"
+          )
+      ) || filters[0];
+
+    if (!hasCategory(launcherFilter)) {
+      launcherFilter.category = launcherFilter.category || [];
+      launcherFilter.category.push({
+        $: { "android:name": LEANBACK },
+      });
+    }
+
+    mainActivity["intent-filter"] = Array.isArray(mainActivity["intent-filter"])
+      ? filters
+      : filters[0];
 
     return cfg;
   });

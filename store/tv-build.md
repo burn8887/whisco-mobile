@@ -16,7 +16,8 @@
 | Catalogue = **eight news lives + eight Archive films** | `app/tv.tsx` renders the `android` header payload, capped at 8 + 8 |
 | Wordmark is the text **"Whisco.tv"** | `app/tv.tsx` header — text, not an image |
 | Dark field **#0a0a0f** | `tv.bg` = `colors.bg` = `#0a0a0f` |
-| **LEANBACK_LAUNCHER, touchscreen not required, 320×180 banner** | `plugins/withAndroidTV.js` — see §3 for exactly what is and is not declared |
+| **LEANBACK_LAUNCHER** | Added 4 Oct 2026 (second Desk ruling) — see §3 |
+| **touchscreen not required, 320×180 banner** | `plugins/withAndroidTV.js` — see §3 |
 | Films may start the same way | `app/tv-film/[slug].tsx` — native ExoPlayer (archive.org MP4), autoplay, BACK leaves |
 | No "Free", no "500+", no invented titles | Zero occurrences in the TV copy; only channel/film names from the API |
 
@@ -35,12 +36,44 @@ On a phone both TV routes immediately `router.replace("/")`, so the phone UI, th
 |---|---|---|
 | `uses-feature android.software.leanback` | `required="false"` | Declares TV capability while keeping the same APK installable on phones |
 | `uses-feature android.hardware.touchscreen` | `required="false"` | **Without this Play filters televisions out entirely** — the single most common reason a TV app never appears on a TV |
+| `category android.intent.category.LEANBACK_LAUNCHER` | on the MainActivity's existing MAIN/LAUNCHER filter | **Added 4 Oct 2026 (second Desk ruling).** Google: without this filter the app "is not visible to users running Google Play on TV devices" and "does not appear in the TV user interface" |
 | `android:banner` on `<application>` | `@drawable/tv_banner` | Google's TV banner; the PNG is 320×180 xhdpi, verified by the plugin before use |
 | resource file | `res/drawable-xhdpi/tv_banner.png` | Written by the plugin's dangerous mod — **measured**: `expo prebuild` does *not* auto-collect `assets/tv/`, so without the copy the manifest would reference a drawable that does not exist |
 
-**Deliberately NOT added: a `LEANBACK_LAUNCHER` intent-filter.** Reason, stated plainly: adding it to the *same* activity changes how that activity resolves on TV devices (it becomes a launcher entry), and that is a runtime behaviour that **cannot be verified in this sandbox** — there is no device or emulator here, and the Desk limited this to a branch. It is the documented next step before a TV release (§5). The existing `MAIN`/`LAUNCHER` filter is untouched, so phone behaviour is byte-for-byte unchanged.
+### Why the category went into the existing filter
 
-Verified by running `npx expo prebuild --platform android` locally and reading the generated manifest, then reverting the prebuild (no `android/` is committed; `package.json` restored):
+React Native ships **one** activity (`MainActivity`) that serves phone and TV; the split happens in JS via `Platform.isTV`. Google's documented pattern for that case puts both categories in the **same** intent-filter:
+
+```xml
+<intent-filter>
+  <action android:name="android.intent.action.MAIN" />
+  <category android:name="android.intent.category.LAUNCHER" />
+  <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+</intent-filter>
+```
+
+*(developer.android.com/training/tv/get-started/create — fetched 4 Oct 2026; page updated 2026-09-28. The separate-activity form shown earlier on the same page is for apps with a distinct TV activity. We do not have one, and adding one would mean native code that cannot be built or tested in this workspace.)*
+
+`LAUNCHER` is left in place, so the **phone icon and phone launch path are unchanged** — the change is purely additive.
+
+Verified by running `npx expo prebuild --platform android` locally and reading the generated manifest, then reverting the prebuild (no `android/` committed; `package.json` restored):
+
+```xml
+<activity android:name=".MainActivity" ... android:exported="true"
+          android:supportsPictureInPicture="true">
+  <intent-filter>
+    <action android:name="android.intent.action.MAIN"/>
+    <category android:name="android.intent.category.LAUNCHER"/>
+    <category android:name="android.intent.category.LEANBACK_LAUNCHER"/>
+  </intent-filter>
+  <intent-filter>
+    <action android:name="android.intent.action.VIEW"/>
+    <category android:name="android.intent.category.DEFAULT"/>
+    <category android:name="android.intent.category.BROWSABLE"/>
+    <data android:scheme="whiscotv"/>
+  </intent-filter>
+</activity>
+```
 
 ```
 <uses-feature android:name="android.software.leanback" android:required="false"/>
@@ -48,7 +81,7 @@ Verified by running `npx expo prebuild --platform android` locally and reading t
 <application ... android:banner="@drawable/tv_banner">
 ```
 
-The plugin also **fails prebuild** if the banner is missing or not exactly 320×180 — tested by temporarily swapping in a 300×180 file and confirming the build refused with a clear message.
+The plugin also **fails prebuild** if the banner is missing or not exactly 320×180 — tested by temporarily swapping in a 300×180 file and confirming the build refused with a clear message. It also throws if the main activity has no intent-filter, rather than guessing where the category belongs.
 
 ## 4. Focus order (the remote's whole UI)
 
@@ -63,12 +96,12 @@ Marked [UNMEASURED] rather than guessed. There is no Android device or emulator 
 3. **[UNMEASURED]** That BACK from `app/tv-film/[slug].tsx` returns to the TV list and then exits, in the order a viewer expects.
 4. **[UNMEASURED]** Whether the YouTube embed renders correctly at 1080p/4K TV density and TV user-agent (the code carries an "error 153" workaround for the WebView origin that has never been exercised on TV).
 5. **[UNMEASURED]** Whether the device reports `uiMode == "tv"` as expected on every Google TV/Android TV device class the Desk intends to reach (this is what the phone guard depends on).
-6. **[UNMEASURED]** The `LEANBACK_LAUNCHER` step (§3) — deciding to add it, and then verifying it, are both still open.
+6. **[UNMEASURED]** That the `LEANBACK_LAUNCHER` entry actually appears on a real TV home screen and launches this build — the manifest line is verified (§3), the runtime behaviour on a device is not. **This is the first thing to check on a device.**
 7. **[UNMEASURED]** The film screen uses the shared player's **native (ExoPlayer) controls**, which the ruling did not ask us to remove and which the phone shares. Whether a TV remote can drive those native controls is not known here, and does not need to be — **autoplay and BACK are the ruled behaviour and neither depends on them**. If the Desk wants a controls-free film screen later, that is a change to the TV route only, not to the shared component.
 
 ## 6. Before this could ship (nothing below is done, and none of it is started)
 
-1. Ruling on the `LEANBACK_LAUNCHER` filter, then a device check of §5.1–5.5.
+1. A device check of §5.1–5.6 — the manifest side is complete; nothing about how the TV behaves has been run anywhere.
 2. A TV **form-factor release track** in Play Console — a release the founder presses. The phone track stays on versionCode 7; **EAS owns the version code remotely** (`eas.json`: `appVersionSource: "remote"`, `production.autoIncrement: true`), so the plan for a TV track's versionCode must be ruled before any build exists.
 3. A TV listing (banner already 320×180; screenshots of the TV layout do not exist yet).
 4. Only then: build and submit — neither by this agent.
