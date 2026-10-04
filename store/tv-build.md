@@ -64,6 +64,7 @@ Marked [UNMEASURED] rather than guessed. There is no Android device or emulator 
 4. **[UNMEASURED]** Whether the YouTube embed renders correctly at 1080p/4K TV density and TV user-agent (the code carries an "error 153" workaround for the WebView origin that has never been exercised on TV).
 5. **[UNMEASURED]** Whether the device reports `uiMode == "tv"` as expected on every Google TV/Android TV device class the Desk intends to reach (this is what the phone guard depends on).
 6. **[UNMEASURED]** The `LEANBACK_LAUNCHER` step (§3) — deciding to add it, and then verifying it, are both still open.
+7. **[UNMEASURED]** The film screen uses the shared player's **native (ExoPlayer) controls**, which the ruling did not ask us to remove and which the phone shares. Whether a TV remote can drive those native controls is not known here, and does not need to be — **autoplay and BACK are the ruled behaviour and neither depends on them**. If the Desk wants a controls-free film screen later, that is a change to the TV route only, not to the shared component.
 
 ## 6. Before this could ship (nothing below is done, and none of it is started)
 
