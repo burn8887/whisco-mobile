@@ -1,5 +1,5 @@
 import React from "react";
-import { ScrollView, View, Text, StyleSheet, Pressable, Linking } from "react-native";
+import { ScrollView, View, Text, StyleSheet, Pressable, Linking, Platform } from "react-native";
 import { Image } from "expo-image";
 import { LinearGradient } from "expo-linear-gradient";
 import { Stack } from "expo-router";
@@ -51,6 +51,22 @@ export default function AboutScreen() {
           Filipino, Arab, Indonesian, Turkish-drama audiences and more — and for anyone anywhere who wants TV from
           home. No subscription, no signup required, no catch.
         </Text>
+
+        {Platform.OS === "android" && (
+          <Pressable
+            accessibilityRole="link"
+            accessibilityLabel="Open the full Whisco TV catalogue on whisco.tv in your browser"
+            style={styles.catalogueCard}
+            onPress={() => void Linking.openURL("https://www.whisco.tv")}
+          >
+            <Text style={styles.catalogueGlyph}>↗</Text>
+            <View style={{ flex: 1 }}>
+              <Text style={styles.catalogueText}>Full catalogue is on the website — whisco.tv</Text>
+              <Text style={styles.catalogueSubtext}>Opens in your browser</Text>
+            </View>
+            <Text style={styles.catalogueArrow}>›</Text>
+          </Pressable>
+        )}
 
         <Text style={styles.section}>Where our content comes from</Text>
         <Text style={styles.body}>
@@ -108,6 +124,21 @@ const styles = StyleSheet.create({
   heroBody: { color: colors.textDim, fontSize: font.body, lineHeight: 21, marginTop: spacing.sm },
   section: { color: colors.text, fontSize: font.heading, fontWeight: "800", marginTop: spacing.lg, marginBottom: spacing.sm },
   body: { color: colors.textDim, fontSize: font.body, lineHeight: 21 },
+  catalogueCard: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: spacing.md,
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.orange,
+    borderRadius: radius.lg,
+    padding: spacing.md,
+    marginTop: spacing.md,
+  },
+  catalogueGlyph: { color: colors.orange, fontSize: 22, fontWeight: "900", width: 24, textAlign: "center" },
+  catalogueText: { color: colors.text, fontSize: font.body, fontWeight: "800" },
+  catalogueSubtext: { color: colors.textDim, fontSize: font.small, marginTop: 3 },
+  catalogueArrow: { color: colors.orange, fontSize: 24, fontWeight: "700" },
   contactRow: {
     flexDirection: "row",
     alignItems: "center",
