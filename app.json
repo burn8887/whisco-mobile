@@ -15,7 +15,6 @@
     },
     "android": {
       "package": "tv.whisco.app",
-      "versionCode": 1,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0a0a0f"
@@ -31,7 +30,6 @@
     "ios": {
       "bundleIdentifier": "tv.whisco.app",
       "supportsTablet": false,
-      "buildNumber": "8",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSAppTransportSecurity": {
